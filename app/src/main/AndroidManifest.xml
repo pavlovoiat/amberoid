@@ -6,7 +6,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ForegroundServicesPolicy" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -20,12 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Amberoid">
         <activity
-            android:name=".MainActivity"
+            android:name=".legacy.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:colorMode="wideColorGamut"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Amberoid">
+            android:theme="@style/Theme.Amberoid"
+            tools:targetApi="26">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,9 +34,10 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.pavo.amberoid.service.PlaybackService"
+            android:name="com.pavo.amberoid.legacy.service.PlaybackService"
             android:foregroundServiceType="mediaPlayback"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
                 <action android:name="android.media.browse.MediaBrowserService" />
