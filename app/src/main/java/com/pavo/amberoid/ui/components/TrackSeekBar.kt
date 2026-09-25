@@ -52,7 +52,7 @@ fun WaveformSeekBar(
         val random = Random(songId.toInt())
         val barCount = 75
 
-        List(barCount) { index ->
+        List(barCount) { _ ->
             0.25f + random.nextFloat() * 0.75f
         }
     }
