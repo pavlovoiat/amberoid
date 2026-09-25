@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,6 +57,8 @@ fun WaveformSeekBar(
         }
     }
 
+    var isDragging by remember { mutableStateOf(false) }
+    var dragFraction by remember { mutableFloatStateOf(0f) }
     Canvas(
         modifier = modifier
             .size(300.dp, 50.dp)
@@ -68,9 +71,16 @@ fun WaveformSeekBar(
             .pointerInput(songId) {
                 detectDragGestures(
                     onDrag = { change, _ ->
+                        isDragging = true
                         change.consume()
-                        val newFraction = (change.position.x / size.width).coerceIn(0f, 1f)
-                        onSeek(newFraction)
+                        dragFraction = (change.position.x / size.width).coerceIn(0f, 1f)
+                    },
+                    onDragEnd = {
+                        isDragging = false
+                        onSeek(dragFraction)
+                    },
+                    onDragCancel = {
+                        isDragging = false
                     }
                 )
             }
@@ -87,8 +97,19 @@ fun WaveformSeekBar(
             val top = (height - barHeight) / 2f
 
             val barCenterFraction = (left + barWidth / 2f) / width
-            val isPlayed = barCenterFraction <= animatedProgress
-            val color = if (isPlayed) activeColor else inactiveColor
+            val color = when {
+                isDragging -> when {
+                    barCenterFraction in minOf(animatedProgress, dragFraction)..maxOf(animatedProgress, dragFraction) -> {
+                        activeColor.copy(0.5f)
+                    }
+                    barCenterFraction <= animatedProgress -> activeColor
+                    else -> inactiveColor
+                }
+                barCenterFraction <= animatedProgress -> activeColor
+                else -> {
+                    inactiveColor
+                }
+            }
 
             drawRoundRect(
                 color = color,
