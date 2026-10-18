@@ -4,69 +4,68 @@
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp" height="128">
 </p>
 
-**Amberoid** — это супер-минималистичный музыкальный плеер для Android, вдохновлённый эстетикой и простотой десктопного плеера Amberol.
+**Amberoid** is a super-minimalist music player for Android, inspired by the aesthetics and simplicity of the desktop player Amberol.
 
-Он создан для тех, кто просто хочет слушать музыку, не отвлекаясь на сложные настройки, выравниватели громкости или создание бесконечных плейлистов.
+It's made for those who just want to listen to music without being distracted by complex settings, volume leveling, or endless playlist creation.
 
 <p align="center">
-  <img src="screenshots/playlist_view.jpg" width="30%" alt="Скриншот плейлиста">
-  <img src="screenshots/player_view.jpg" width="30%" alt="Скриншот плеера">
+  <img src="screenshots/playlist_view.jpg" width="30%" alt="Playlist screenshot">
+  <img src="screenshots/player_view.jpg" width="30%" alt="Player screenshot">
 </p>
 
-## ✨ Особенности
+## Features
 
-* **Абсолютный минимализм:** Интерфейс, который не мешает.
-* **Адаптивный дизайн:** Цвета интерфейса подстраиваются под обложку текущего трека (как в оригинале).
-* **Ничего лишнего:** Только музыка, плейлист и базовое управление.
-* **Полностью открытый исходный код:** Никаких трекеров, аналитики или рекламы.
+* **Absolute minimalism:** An interface that doesn't get in the way.
+* **Adaptive design:** The interface colors adapt to the cover art of the current track (just like the original).
+* **Nothing extra:** Just music, a playlist, and basic controls.
+* **Fully open source:** No trackers, analytics, or ads.
 
-## 🤝 Атрибуция и вдохновение
+## Attribution and Inspiration
 
-Этот проект является независимой реализацией идей дизайна плеера **Amberol** для платформы Android.
+This project is an independent implementation of the design ideas of the **Amberol** player for the Android platform.
 
-Я выражаю огромную благодарность **Emmanuele Bassi**, автору оригинального Amberol, за создание столь чистого и вдохновляющего интерфейса. Amberoid стремится перенести этот опыт на мобильные устройства, сохраняя верность духу оригинала.
+I express my huge gratitude to **Emmanuele Bassi**, the author of the original Amberol, for creating such a clean and inspiring interface. Amberoid strives to bring this experience to mobile devices while staying true to the spirit of the original.
 
-*Оригинальный Amberol (для GNOME):* [https://gitlab.gnome.org/World/amberol](https://gitlab.gnome.org/World/amberol)
+*Original Amberol:* [https://gitlab.gnome.org/World/amberol](https://gitlab.gnome.org/World/amberol)
 
-## 📥 Скачать
+## Download
 
-Готовые сборки приложения можно найти в разделе **Releases**:
+Ready-to-use builds of the app can be found in the **Releases** section:
 
-Последняя версия:
+Latest version:
 
-[![Download APK](https://img.shields.io/badge/Download-APK-green?style=for-the-badge&logo=android)](https://github.com/PavloVoiat/Amberoid/releases/download/v1.0.0/amberoid.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK-green?style=for-the-badge&logo=android)](https://github.com/pavlovoiat/amberoid/releases/download/v1.1.0/amberoid.apk)
 
-Если вы хотите скачать другие версии:
+If you want to download other versions:
 
-1. Перейдите в раздел [Releases](https://github.com/PavloVoiat/Amberoid/releases/).
-2. Скачайте файл **`amberoid.apk`** (или `app-release.apk`).
-3. Установите его на устройство и пользуйтесь!
+1. Go to the [Releases](https://github.com/pavlovoiat/amberoid/releases/) section.
+2. Download the **`amberoid.apk`** file (or `app-release.apk`).
+3. Install it on your device and enjoy!
 
-## 🛠 Сборка из исходников
+## Building from Source
 
-Для сборки вам понадобятся только **Git** и **JDK 17** (или новее). Устанавливать Android Studio не требуется.
+To build, you only need **Git** and **JDK 17** (or newer). Installing Android Studio is not required.
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
    ```bash
-   git clone https://github.com/ТВОЙ_ЛОГИН/amberoid.git
+   git clone https://github.com/pavlovoiat/amberoid.git
    cd amberoid
    ```
+2. Build the APK using the Gradle Wrapper:
+- **Linux/macOS:**
+  ```bash
+  ./gradlew assembleRelease
+  ```
+- **Windows (PowerShell/CMD):**
+  ```cmd
+  gradlew.bat assembleRelease
+  ```
+The finished `.apk` will appear at: `app/build/output/apk/release/`.
 
-2. Соберите APK через Gradle Wrapper:
- - **Linux/macOS:**
-   ```bash
-   ./gradlew assembleRelease
-   ```
- - **Windows (PowerShell/CMD):**
-   ```cmd
-   gradlew.bat assembleRelease
-   ```
+## Changelog
 
-Готовый файл `.apk` появится по пути: `app/build/outputs/apk/release/`.
+All updates and the project's changelog are available in the [CHANGELOG.md](CHANGELOG.md) file.
 
-## 📝 История изменений
+## License
 
-Все обновления и список изменений проекта доступны в файле [CHANGELOG.md](CHANGELOG.md).
-
-## 📜 Лицензия
-Этот проект распространяется под лицензией **GPL-3.0**. Это означает, что вы можете свободно использовать, изучать, изменять и распространять этот софт, при условии сохранения той же лицензии для производных работ. Полный текст лицензии находится в файле `LICENSE.md`.
+This project is distributed under the **GPL-3.0** license. This means you are free to use, study, modify, and distribute this software, provided that the same license is preserved for derivative works. The full license text can be found in the [LICENSE.md](LICENSE.md) file.
