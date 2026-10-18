@@ -462,14 +462,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun applySort(list: List<Song>, order: SortOrder): List<Song> {
         return when (order) {
-            SortOrder.TITLE_ASC -> originalSongs.sortedBy { it.title.lowercase() }
-            SortOrder.TITLE_DESC -> originalSongs.sortedByDescending { it.title.lowercase() }
-            SortOrder.ARTIST_ASC -> originalSongs.sortedBy { it.artist.lowercase() }
-            SortOrder.ARTIST_DESC -> originalSongs.sortedByDescending { it.artist.lowercase() }
-            SortOrder.DURATION_ASC -> originalSongs.sortedBy { it.duration }
-            SortOrder.DURATION_DESC -> originalSongs.sortedByDescending { it.duration }
-            SortOrder.DATE_ASC -> originalSongs.sortedBy { it.dateAdded }
-            SortOrder.DATE_DESC -> originalSongs.sortedByDescending { it.dateAdded }
+            SortOrder.TITLE_ASC -> list.sortedBy { it.title.lowercase() }
+            SortOrder.TITLE_DESC -> list.sortedByDescending { it.title.lowercase() }
+            SortOrder.ARTIST_ASC -> list.sortedBy { it.artist.lowercase() }
+            SortOrder.ARTIST_DESC -> list.sortedByDescending { it.artist.lowercase() }
+            SortOrder.DURATION_ASC -> list.sortedBy { it.duration }
+            SortOrder.DURATION_DESC -> list.sortedByDescending { it.duration }
+            SortOrder.DATE_ASC -> list.sortedBy { it.dateAdded }
+            SortOrder.DATE_DESC -> list.sortedByDescending { it.dateAdded }
         }
     }
 
