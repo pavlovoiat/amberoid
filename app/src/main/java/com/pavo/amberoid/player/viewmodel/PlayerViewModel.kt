@@ -38,7 +38,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private val repository = AudioRepository(appContext)
     private val prefs = PlaybackPreferences(appContext)
-    private val artworkPaletteHelper = ArtworkPaletteHelper()
+    private val artworkPalette = ArtworkPalette()
     private val volumeManager = VolumeManager(appContext)
 
     private var mediaController: MediaController? = null
@@ -354,7 +354,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         .mapLatest { song ->
             song?.let {
                 withContext(Dispatchers.IO) {
-                    artworkPaletteHelper.getArtwork(appContext, it.contentUri)
+                    artworkPalette.getArtwork(appContext, it.contentUri)
                 }
             }
         }
@@ -365,12 +365,12 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         )
 
     fun getArtwork(context: Context, uri: Uri): ByteArray? {
-        return artworkPaletteHelper.getArtwork(context, uri)
+        return artworkPalette.getArtwork(context, uri)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val colorScheme: StateFlow<CoverPalette> = artworkBytes
-        .mapLatest { bytes -> artworkPaletteHelper.extractFullPalette(bytes) }
+        .mapLatest { bytes -> artworkPalette.extractFullPalette(bytes) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

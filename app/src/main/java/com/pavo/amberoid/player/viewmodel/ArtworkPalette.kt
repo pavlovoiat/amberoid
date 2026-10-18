@@ -12,7 +12,7 @@ import com.pavo.amberoid.data.model.CoverPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ArtworkPaletteHelper {
+class ArtworkPalette {
     private val artworkCache = mutableMapOf<Uri, ByteArray?>()
 
     fun getArtwork(context: Context, uri: Uri): ByteArray? {
