@@ -46,6 +46,7 @@ import com.pavo.amberoid.ui.screen.modules.FunctionsBottomSheet
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.pavo.amberoid.data.model.UiEvent
 import com.pavo.amberoid.ui.screen.modules.ShufflePlaylistButton
 import com.pavo.amberoid.ui.screen.modules.SkipNext
 import com.pavo.amberoid.ui.screen.modules.SkipPrevious
@@ -124,7 +125,7 @@ fun AmberoidUI(
                 currentSort = currentSort,
                 onSortSelected = {newSort ->
                     currentSort = newSort
-                    viewModel.updateSortOrder(newSort)
+                    viewModel.onEvent(UiEvent.UpdateSortOrder(newSort))
                 }
             )
         }
@@ -190,7 +191,7 @@ fun AmberoidUI(
                         songId = currentSong?.id ?: 0L,
                         onSeek = { fraction ->
                             val targetMs = (fraction * duration).toLong()
-                            viewModel.seekTo(targetMs)
+                            viewModel.onEvent(UiEvent.SeekTo(targetMs))
                         },
                         modifier = Modifier.padding(horizontal = 30.dp),
                         activeColor = contentColor,
@@ -226,7 +227,7 @@ fun AmberoidUI(
 
                         VolumeBar(
                             color = secondaryButtonColor,
-                            onVolumeChange = { newVolume -> viewModel.setVolume(newVolume) },
+                            onVolumeChange = { newVolume -> viewModel.onEvent(UiEvent.SetVolume(newVolume)) },
                             volume = volume
                         )
 
@@ -243,20 +244,20 @@ fun AmberoidUI(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         SkipPrevious(
-                            onPreviousClick = { viewModel.playPrevious() },
+                            onPreviousClick = { viewModel.onEvent(UiEvent.PlayPrevious) },
                             color = secondaryButtonColor,
                             iconColor = secondaryIconColor
                         )
 
                         PlayPause(
                             isPlaying = isPlaying,
-                            onPlayToggle = { viewModel.togglePlayPause() },
+                            onPlayToggle = { viewModel.onEvent(UiEvent.TogglePlayPause) },
                             color = primaryButtonColor,
                             iconColor = primaryIconColor
                         )
 
                         SkipNext(
-                            onNextClick = { viewModel.playNext() },
+                            onNextClick = { viewModel.onEvent(UiEvent.PlayNext) },
                             color = secondaryButtonColor,
                             iconColor = secondaryIconColor
                         )
@@ -275,7 +276,7 @@ fun AmberoidUI(
 
                         ShufflePlaylistButton(
                             color = secondaryButtonColor,
-                            onShuffle = { viewModel.toggleShuffle() },
+                            onShuffle = { viewModel.onEvent(UiEvent.ToggleShuffle) },
                             isShuffleEnabled = isShuffleEnabled,
                             iconColor = secondaryIconColor
                         )
@@ -284,7 +285,7 @@ fun AmberoidUI(
 
                         RepeatPlaylistButton(
                             color = secondaryButtonColor,
-                            onRepeat = { viewModel.toggleRepeatMode() },
+                            onRepeat = { viewModel.onEvent(UiEvent.ToggleRepeatMode) },
                             repeatMode = repeatMode,
                             iconColor = secondaryIconColor
                         )
@@ -339,7 +340,7 @@ fun AmberoidUI(
                                 songId = currentSong?.id ?: 0L,
                                 onSeek = { fraction ->
                                     val targetMs = (fraction * duration).toLong()
-                                    viewModel.seekTo(targetMs)
+                                    viewModel.onEvent(UiEvent.SeekTo(targetMs))
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 activeColor = contentColor,
@@ -365,20 +366,20 @@ fun AmberoidUI(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             SkipPrevious(
-                                onPreviousClick = { viewModel.playPrevious() },
+                                onPreviousClick = { viewModel.onEvent(UiEvent.PlayPrevious) },
                                 color = secondaryButtonColor,
                                 iconColor = secondaryIconColor
                             )
 
                             PlayPause(
                                 isPlaying = isPlaying,
-                                onPlayToggle = { viewModel.togglePlayPause() },
+                                onPlayToggle = { viewModel.onEvent(UiEvent.TogglePlayPause) },
                                 color = primaryButtonColor,
                                 iconColor = primaryIconColor
                             )
 
                             SkipNext(
-                                onNextClick = { viewModel.playNext() },
+                                onNextClick = { viewModel.onEvent(UiEvent.PlayNext) },
                                 color = secondaryButtonColor,
                                 iconColor = secondaryIconColor
                             )
@@ -397,7 +398,7 @@ fun AmberoidUI(
 
                             VolumeBar(
                                 color = secondaryButtonColor,
-                                onVolumeChange = { newVolume -> viewModel.setVolume(newVolume) },
+                                onVolumeChange = { newVolume -> viewModel.onEvent(UiEvent.SetVolume(newVolume)) },
                                 volume = volume
                             )
 
@@ -421,14 +422,14 @@ fun AmberoidUI(
 
                             ShufflePlaylistButton(
                                 color = secondaryButtonColor,
-                                onShuffle = { viewModel.toggleShuffle() },
+                                onShuffle = { viewModel.onEvent(UiEvent.ToggleShuffle) },
                                 isShuffleEnabled = isShuffleEnabled,
                                 iconColor = secondaryIconColor
                             )
 
                             RepeatPlaylistButton(
                                 color = secondaryButtonColor,
-                                onRepeat = { viewModel.toggleRepeatMode() },
+                                onRepeat = { viewModel.onEvent(UiEvent.ToggleRepeatMode) },
                                 repeatMode = repeatMode,
                                 iconColor = secondaryIconColor
                             )
