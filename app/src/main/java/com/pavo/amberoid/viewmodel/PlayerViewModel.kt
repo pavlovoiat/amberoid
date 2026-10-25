@@ -16,6 +16,8 @@ import com.pavo.amberoid.data.local.PlaybackPreferences
 import com.pavo.amberoid.data.model.CoverPalette
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
+import com.pavo.amberoid.data.model.UiEvent
+import com.pavo.amberoid.data.model.UiState
 import com.pavo.amberoid.data.repository.AudioRepository
 import com.pavo.amberoid.service.PlaybackService
 import com.pavo.amberoid.viewmodel.modules.ArtworkPalette
@@ -78,6 +80,22 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     val repeatMode: StateFlow<Int> = _repeatMode.asStateFlow()
 
     private var currentSortOrder: SortOrder = prefs.getSortOrder()
+
+    private val _uistate = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uistate.asStateFlow()
+
+    fun onEvent(event: UiEvent) {
+        when (event) {
+            is UiEvent.PlayPrevious -> playPrevious()
+            is UiEvent.PlayNext -> playNext()
+            is UiEvent.TogglePlayPause -> togglePlayPause()
+            is UiEvent.ToggleShuffle -> toggleShuffle()
+            is UiEvent.ToggleRepeatMode -> toggleRepeatMode()
+            is UiEvent.SeekTo -> seekTo(event.positionMs)
+            is UiEvent.SetVolume -> setVolume(event.volume)
+            is UiEvent.UpdateSortOrder -> updateSortOrder(event.sortOrder)
+        }
+    }
 
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
