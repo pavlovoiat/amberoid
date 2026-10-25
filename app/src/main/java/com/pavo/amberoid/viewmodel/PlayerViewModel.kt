@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -45,7 +46,12 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val repository = AudioRepository(appContext)
     private val prefs = PlaybackPreferences(appContext)
     private val artworkPalette = ArtworkPalette()
-    private val volumeManager = VolumeManager(appContext)
+    private val volumeManager = VolumeManager(
+        appContext,
+        onUpdateState = { update ->
+            _uiState.update(update)
+        }
+    )
 
     private var mediaController: MediaController? = null
     private var progressUpdateJob: Job? = null
@@ -81,8 +87,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private var currentSortOrder: SortOrder = prefs.getSortOrder()
 
-    private val _uistate = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uistate.asStateFlow()
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     fun onEvent(event: UiEvent) {
         when (event) {
@@ -100,6 +106,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             _isPlaying.value = isPlaying
+            _uiState.update { it.copy(isPlaying = isPlaying) }
+
             if (isPlaying) {
                 startProgressUpdate()
             }
@@ -108,6 +116,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_READY) {
                 _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+                _uiState.update { it.copy(duration = mediaController?.duration?.coerceAtLeast(0L) ?: 0L) }
             }
         }
 
@@ -118,6 +127,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
             if (newIndex in songList.indices) {
                 _currentSong.value = songList[newIndex]
+                _uiState.update { it.copy(currentSong = songList[newIndex]) }
             }
         }
     }
@@ -173,6 +183,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                             }
                             if (currentItems.isNotEmpty()) {
                                 _songs.value = currentItems
+                                _uiState.update { it.copy(songs = currentItems) }
                             }
                         }
                         isStateRestored = true
@@ -192,7 +203,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             if (index != -1) {
                 controller.seekTo(index, lastPosition)
                 _currentSong.value = songs[index]
+                _uiState.update { it.copy(currentSong = songs[index]) }
                 _currentPosition.value = lastPosition
+                _uiState.update { it.copy(currentPosition = lastPosition) }
                 controller.prepare()
             }
         }
@@ -201,15 +214,20 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun updateStateFromController(controller: MediaController) {
         _isPlaying.value = controller.isPlaying
+        _uiState.update { it.copy(isPlaying = controller.isPlaying) }
         _duration.value = controller.duration.coerceAtLeast(0L)
+        _uiState.update { it.copy(duration = controller.duration.coerceAtLeast(0L)) }
         _repeatMode.value = controller.repeatMode
+        _uiState.update { it.copy(repeatMode = controller.repeatMode) }
         _currentPosition.value = controller.currentPosition.coerceAtLeast(0L)
+        _uiState.update { it.copy(currentPosition = controller.currentPosition.coerceAtLeast(0L)) }
 
         val currentIndex = controller.currentMediaItemIndex
         val currentList = _songs.value
         
         if (currentList.isNotEmpty() && currentIndex in currentList.indices) {
             _currentSong.value = currentList[currentIndex]
+            _uiState.update { it.copy(currentSong = currentList[currentIndex]) }
         }
     }
 
@@ -219,7 +237,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             while (mediaController?.isPlaying == true) {
                 val pos = mediaController?.currentPosition?.coerceAtLeast(0L) ?: 0L
                 _currentPosition.value = pos
+                _uiState.update { it.copy(currentPosition = pos) }
                 _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+                _uiState.update { it.copy(duration = mediaController?.duration?.coerceAtLeast(0L) ?: 0L) }
                 delay(500.milliseconds)
             }
         }
@@ -228,6 +248,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     fun seekTo(positionMs: Long) {
         mediaController?.seekTo(positionMs)
         _currentPosition.value = positionMs
+        _uiState.update { it.copy(currentPosition = positionMs) }
     }
 
     fun loadSongs() {
@@ -237,6 +258,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             val loadedSongs = repository.getAudioFiles()
             originalSongs = loadedSongs
             _songs.value = applySort(loadedSongs, currentSortOrder)
+            _uiState.update { it.copy(songs = applySort(loadedSongs, currentSortOrder)) }
         }
     }
 
@@ -254,6 +276,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val currentIndex = controller.currentMediaItemIndex
         if (currentIndex in songs.indices) {
             _currentSong.value = songs[currentIndex]
+            _uiState.update { it.copy(currentSong = songs[currentIndex]) }
         }
     }
 
@@ -263,6 +286,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         if (index == -1) return
 
         _currentSong.value = song
+        _uiState.update { it.copy(currentSong = song) }
 
         mediaController?.let { controller ->
             if (controller.mediaItemCount != allSongs.size) {
@@ -320,8 +344,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun toggleShuffle() {
         mediaController?.let { controller ->
-            val newState = !isShuffleEnabled.value
+            val newState = !_isShuffleEnabled.value
             _isShuffleEnabled.value = newState
+            _uiState.update { it.copy(isShuffleEnabled = newState) }
 
             val current = _currentSong.value
             val currentPos = _currentPosition.value
@@ -329,8 +354,10 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             if (newState) {
                 val shuffledList = originalSongs.filter { it.id != current?.id }.shuffled()
                 _songs.value = if (current != null) listOf(current) + shuffledList else shuffledList
+                _uiState.update { it.copy(songs = if (current != null) listOf(current) + shuffledList else shuffledList) }
             } else {
                 _songs.value = applySort(originalSongs, currentSortOrder)
+                _uiState.update { it.copy(songs = applySort(originalSongs, currentSortOrder)) }
             }
 
             val mediaItems = _songs.value.map {
@@ -361,6 +388,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
             controller.repeatMode = nextMode
             _repeatMode.value = nextMode
+            _uiState.update { it.copy(repeatMode = nextMode) }
         }
     }
 
@@ -458,6 +486,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val sortedList = applySort(originalSongs, newOrder)
 
         _songs.value = sortedList
+        _uiState.update { it.copy(songs = sortedList) }
 
         mediaController?.let { controller ->
             val mediaItems = sortedList.map { song ->

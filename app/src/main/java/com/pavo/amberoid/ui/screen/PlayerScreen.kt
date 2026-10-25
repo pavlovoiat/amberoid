@@ -69,10 +69,16 @@ fun AmberoidUI(
     windowSizeClass: WindowSizeClass,
     viewModel: PlayerViewModel = viewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val currentSong by viewModel.currentSong.collectAsStateWithLifecycle()
     val currentPosition by viewModel.currentPosition.collectAsStateWithLifecycle()
     val duration by viewModel.duration.collectAsStateWithLifecycle()
+    val volume by viewModel.volume.collectAsStateWithLifecycle()
+    val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsStateWithLifecycle()
+    val repeatMode by viewModel.repeatMode.collectAsStateWithLifecycle()
+    val songs by viewModel.songs.collectAsStateWithLifecycle()
+
     val artworkBytes by viewModel.artworkBytes.collectAsStateWithLifecycle()
     val colorScheme by viewModel.colorScheme.collectAsStateWithLifecycle()
     val topColor = colorScheme.backgroundTop
@@ -83,11 +89,6 @@ fun AmberoidUI(
     
     val primaryIconColor = getContrastColor(primaryButtonColor)
     val secondaryIconColor = getContrastColor(secondaryButtonColor)
-    
-    val volume by viewModel.volume.collectAsStateWithLifecycle()
-    val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsStateWithLifecycle()
-    val repeatMode by viewModel.repeatMode.collectAsStateWithLifecycle()
-    val songs by viewModel.songs.collectAsStateWithLifecycle()
 
     var currentSort by remember { mutableStateOf(viewModel.getSavedSortOrder()) }
 
