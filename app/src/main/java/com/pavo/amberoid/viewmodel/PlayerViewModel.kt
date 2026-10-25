@@ -1,10 +1,11 @@
-package com.pavo.amberoid.player.viewmodel
+package com.pavo.amberoid.viewmodel
 
 import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -17,6 +18,8 @@ import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
 import com.pavo.amberoid.data.repository.AudioRepository
 import com.pavo.amberoid.service.PlaybackService
+import com.pavo.amberoid.viewmodel.modules.ArtworkPalette
+import com.pavo.amberoid.viewmodel.modules.VolumeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -31,6 +34,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
@@ -129,7 +133,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }, androidx.core.content.ContextCompat.getMainExecutor(appContext))
+        }, ContextCompat.getMainExecutor(appContext))
     }
 
     private fun observeInitialization() {
@@ -417,7 +421,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             while (totalSeconds > 0) {
                 val mins = totalSeconds / 60
                 val secs = totalSeconds % 60
-                _sleepTimerText.value = String.format(java.util.Locale.US, "%02d:%02d", mins, secs)
+                _sleepTimerText.value = String.format(Locale.US, "%02d:%02d", mins, secs)
                 delay(1000.milliseconds)
                 totalSeconds--
             }

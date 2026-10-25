@@ -1,4 +1,4 @@
-package com.pavo.amberoid.ui.components
+package com.pavo.amberoid.ui.screen.modules
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pavo.amberoid.player.viewmodel.PlayerViewModel
+import com.pavo.amberoid.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

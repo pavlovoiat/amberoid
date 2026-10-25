@@ -16,8 +16,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pavo.amberoid.player.AmberoidUI
-import com.pavo.amberoid.player.viewmodel.PlayerViewModel
+import com.pavo.amberoid.ui.screen.AmberoidUI
+import com.pavo.amberoid.viewmodel.PlayerViewModel
 import com.pavo.amberoid.ui.theme.AmberoidTheme
 
 val NerdFont: FontFamily = FontFamily(Font(R.font.symbols_nerd_font_regular))

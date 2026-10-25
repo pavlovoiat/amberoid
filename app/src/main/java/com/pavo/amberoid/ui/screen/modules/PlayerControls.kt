@@ -1,6 +1,7 @@
-package com.pavo.amberoid.ui.components
+package com.pavo.amberoid.ui.screen.modules
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
@@ -9,105 +10,83 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import com.pavo.amberoid.NerdFont
 
 @Composable
-fun PlaylistButton(
+fun SkipPrevious(
+    onPreviousClick: () -> Unit,
     color: Color,
-    onClick: () -> Unit,
     iconColor: Color = Color.White
 ) {
     IconButton(
         modifier = Modifier
+            .size(60.dp)
             .background(
                 color = color,
                 shape = RoundedCornerShape(50)
             ),
-        onClick = onClick
+        onClick = onPreviousClick
     ) {
         Text(
-            text = "\uDB80\uDF5C",
-
-            color = iconColor,
-            fontFamily = NerdFont
-        )
-    }
-}
-
-@Composable
-fun ShufflePlaylistButton(
-    color: Color,
-    onShuffle: () -> Unit,
-    isShuffleEnabled: Boolean,
-    iconColor: Color = Color.White
-) {
-    IconButton(
-        modifier = Modifier
-            .background(
-                color = if (!isShuffleEnabled) color else color.copy(0.3f),
-                shape = RoundedCornerShape(50)
-            ),
-        onClick = onShuffle
-    ) {
-        Text(
-            text = "\uDB81\uDC9F",
+            text = "\uDB81\uDCAE",
 
             color = iconColor,
             fontFamily = NerdFont,
+            fontSize = 5.em
         )
     }
 }
 
 @Composable
-fun RepeatPlaylistButton(
+fun SkipNext(
+    onNextClick: () -> Unit,
     color: Color,
-    onRepeat: () -> Unit,
-    repeatMode: Int,
     iconColor: Color = Color.White
 ) {
     IconButton(
         modifier = Modifier
+            .size(60.dp)
             .background(
                 color = color,
                 shape = RoundedCornerShape(50)
-                    ),
-        onClick = onRepeat
+            ),
+        onClick = onNextClick
     ) {
         Text(
-            text = when (repeatMode) {
-                2 -> {
-                    "\uDB81\uDC56"
-                }
-                1 -> {
-                    "\uDB81\uDC58"
-                }
-                else -> {
-                    "\uF061"
-                }
-            },
+            text = "\uDB81\uDCAD",
 
             color = iconColor,
             fontFamily = NerdFont,
+            fontSize = 5.em
         )
     }
 }
 
 @Composable
-fun FunctionsMenuButton(color: Color, onClick: () -> Unit, iconColor: Color = Color.White) {
+fun PlayPause(
+    isPlaying: Boolean,
+    onPlayToggle: () -> Unit,
+    color: Color,
+    iconColor: Color = Color.White
+) {
     IconButton(
         modifier = Modifier
-            .size(48.dp)
+            .size(85.dp)
             .background(
                 color = color,
                 shape = RoundedCornerShape(50)
             ),
-        onClick = onClick
+        onClick = onPlayToggle
     ) {
         Text(
-            text = "\uDB80\uDDD9",
+            text = if (isPlaying) "\uDB80\uDFE4" else "\uF04B",
 
             color = iconColor,
-            fontFamily = NerdFont
+            fontFamily = NerdFont,
+            fontSize = if (isPlaying) 8.em else 6.em,
+            modifier = Modifier
+                .padding(start = if (isPlaying) 0.dp else 3.dp)
         )
     }
 }

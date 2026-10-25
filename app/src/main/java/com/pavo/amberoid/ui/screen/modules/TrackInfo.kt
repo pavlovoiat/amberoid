@@ -1,4 +1,4 @@
-package com.pavo.amberoid.ui.components
+package com.pavo.amberoid.ui.screen.modules
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee

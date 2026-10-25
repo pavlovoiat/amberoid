@@ -1,4 +1,4 @@
-package com.pavo.amberoid.player.viewmodel
+package com.pavo.amberoid.viewmodel.modules
 
 import android.content.Context
 import android.graphics.BitmapFactory

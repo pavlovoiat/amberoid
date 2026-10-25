@@ -1,4 +1,4 @@
-package com.pavo.amberoid.player
+package com.pavo.amberoid.ui.screen
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -23,7 +23,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import com.pavo.amberoid.player.viewmodel.PlayerViewModel
+import com.pavo.amberoid.viewmodel.PlayerViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -35,28 +35,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
-import com.pavo.amberoid.ui.components.ArtistName
-import com.pavo.amberoid.ui.components.PlayPause
-import com.pavo.amberoid.ui.components.PlayedTrackTime
-import com.pavo.amberoid.ui.components.PlaylistButton
-import com.pavo.amberoid.ui.components.PlaylistDrawer
-import com.pavo.amberoid.ui.components.RepeatPlaylistButton
-import com.pavo.amberoid.ui.components.FunctionsMenuButton
-import com.pavo.amberoid.ui.components.FunctionsBottomSheet
+import com.pavo.amberoid.ui.screen.modules.ArtistName
+import com.pavo.amberoid.ui.screen.modules.PlayPause
+import com.pavo.amberoid.ui.screen.modules.PlayedTrackTime
+import com.pavo.amberoid.ui.screen.modules.PlaylistButton
+import com.pavo.amberoid.ui.screen.modules.PlaylistDrawer
+import com.pavo.amberoid.ui.screen.modules.RepeatPlaylistButton
+import com.pavo.amberoid.ui.screen.modules.FunctionsMenuButton
+import com.pavo.amberoid.ui.screen.modules.FunctionsBottomSheet
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.pavo.amberoid.data.model.SortOrder
-import com.pavo.amberoid.ui.components.ShufflePlaylistButton
-import com.pavo.amberoid.ui.components.SkipNext
-import com.pavo.amberoid.ui.components.SkipPrevious
-import com.pavo.amberoid.ui.components.TrackImage
-import com.pavo.amberoid.ui.components.TrackLength
-import com.pavo.amberoid.ui.components.TrackTitle
-import com.pavo.amberoid.ui.components.VolumeBar
-import com.pavo.amberoid.ui.components.VolumeDown
-import com.pavo.amberoid.ui.components.VolumeUp
-import com.pavo.amberoid.ui.components.WaveformSeekBar
+import com.pavo.amberoid.ui.screen.modules.ShufflePlaylistButton
+import com.pavo.amberoid.ui.screen.modules.SkipNext
+import com.pavo.amberoid.ui.screen.modules.SkipPrevious
+import com.pavo.amberoid.ui.screen.modules.TrackImage
+import com.pavo.amberoid.ui.screen.modules.TrackLength
+import com.pavo.amberoid.ui.screen.modules.TrackTitle
+import com.pavo.amberoid.ui.screen.modules.VolumeBar
+import com.pavo.amberoid.ui.screen.modules.VolumeDown
+import com.pavo.amberoid.ui.screen.modules.VolumeUp
+import com.pavo.amberoid.ui.screen.modules.WaveformSeekBar
 import kotlinx.coroutines.launch
 
 fun getContrastColor(color: Color): Color {

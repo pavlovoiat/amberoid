@@ -1,4 +1,4 @@
-package com.pavo.amberoid.ui.components
+package com.pavo.amberoid.ui.screen.modules
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

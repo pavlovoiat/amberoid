@@ -1,4 +1,4 @@
-package com.pavo.amberoid.ui.components
+package com.pavo.amberoid.ui.screen.modules
 
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
@@ -44,7 +44,7 @@ import coil3.compose.AsyncImage
 import com.pavo.amberoid.NerdFont
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
-import com.pavo.amberoid.player.viewmodel.PlayerViewModel
+import com.pavo.amberoid.viewmodel.PlayerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
