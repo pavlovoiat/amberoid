@@ -214,7 +214,12 @@ fun AmberoidUI(
                     ) {
                         VolumeDown(
                             color = primaryButtonColor,
-                            onClick = { viewModel.decreaseVolume() },
+                            onClick = {
+                                if (uiState.volume - 0.1f >= 0f)
+                                    viewModel.onEvent(UiEvent.SetVolume(uiState.volume - 0.1f))
+                                else
+                                    viewModel.onEvent(UiEvent.SetVolume(0f))
+                            },
                             iconColor = primaryIconColor
                         )
 
@@ -226,7 +231,12 @@ fun AmberoidUI(
 
                         VolumeUp(
                             color = primaryButtonColor,
-                            onClick = { viewModel.increaseVolume() },
+                            onClick = {
+                                if (uiState.volume + 0.1f <= 1f)
+                                    viewModel.onEvent(UiEvent.SetVolume(uiState.volume + 0.1f))
+                                else
+                                    viewModel.onEvent(UiEvent.SetVolume(1f))
+                            },
                             iconColor = primaryIconColor
                         )
                     }
@@ -385,7 +395,12 @@ fun AmberoidUI(
                         ) {
                             VolumeDown(
                                 color = primaryButtonColor,
-                                onClick = { viewModel.decreaseVolume() },
+                                onClick = {
+                                    if (uiState.volume - 0.1f >= 0f)
+                                        viewModel.onEvent(UiEvent.SetVolume(uiState.volume - 0.1f))
+                                    else
+                                        viewModel.onEvent(UiEvent.SetVolume(0f))
+                                },
                                 iconColor = primaryIconColor
                             )
 
@@ -397,7 +412,12 @@ fun AmberoidUI(
 
                             VolumeUp(
                                 color = primaryButtonColor,
-                                onClick = { viewModel.increaseVolume() },
+                                onClick = {
+                                    if (uiState.volume + 0.1f <= 1f)
+                                        viewModel.onEvent(UiEvent.SetVolume(uiState.volume + 0.1f))
+                                    else
+                                        viewModel.onEvent(UiEvent.SetVolume(1f))
+                                },
                                 iconColor = primaryIconColor
                             )
                         }
