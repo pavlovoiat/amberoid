@@ -18,13 +18,9 @@ class VolumeManager(
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
 
-    private val _volume = MutableStateFlow(getCurrentVolumeRatio())
-    val volume: StateFlow<Float> = _volume.asStateFlow()
-
     private val volumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
-                _volume.value = getCurrentVolumeRatio()
                 onUpdateState { currentState ->
                     currentState.copy(volume = getCurrentVolumeRatio())
                 }
@@ -48,20 +44,11 @@ class VolumeManager(
 
     fun setVolume(newVolumeRatio: Float) {
         val clampedRatio = newVolumeRatio.coerceIn(0f, 1f)
-        _volume.value = clampedRatio
         onUpdateState { currentState ->
             currentState.copy(volume = clampedRatio)
         }
         val targetVolume = (clampedRatio * maxVolume).toInt()
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
-    }
-
-    fun increaseVolume(step: Float = 0.1f) {
-        setVolume(_volume.value + step)
-    }
-
-    fun decreaseVolume(step: Float = 0.1f) {
-        setVolume(_volume.value - step)
     }
 
     fun release() {
