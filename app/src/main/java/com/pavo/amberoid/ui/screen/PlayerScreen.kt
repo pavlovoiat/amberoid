@@ -70,14 +70,6 @@ fun AmberoidUI(
     viewModel: PlayerViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
-    val currentSong by viewModel.currentSong.collectAsStateWithLifecycle()
-    val currentPosition by viewModel.currentPosition.collectAsStateWithLifecycle()
-    val duration by viewModel.duration.collectAsStateWithLifecycle()
-    val volume by viewModel.volume.collectAsStateWithLifecycle()
-    val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsStateWithLifecycle()
-    val repeatMode by viewModel.repeatMode.collectAsStateWithLifecycle()
-    val songs by viewModel.songs.collectAsStateWithLifecycle()
 
     val artworkBytes by viewModel.artworkBytes.collectAsStateWithLifecycle()
     val colorScheme by viewModel.colorScheme.collectAsStateWithLifecycle()
@@ -103,7 +95,7 @@ fun AmberoidUI(
         label = "BottomColorAnimation"
     )
 
-    val progressFraction = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f
+    val progressFraction = if (uiState.duration > 0) uiState.currentPosition.toFloat() / uiState.duration.toFloat() else 0f
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -116,8 +108,8 @@ fun AmberoidUI(
                 primaryColor = colorScheme.accent.copy(0.5f),
                 secondaryColor = colorScheme.surface.copy(0.9f),
                 textColor = contentColor,
-                songs = songs,
-                currentSong = currentSong,
+                songs = uiState.songs,
+                currentSong = uiState.currentSong,
                 onSongClick = { song ->
                     viewModel.selectSong(song)
                     viewModel.play()
@@ -176,12 +168,12 @@ fun AmberoidUI(
                     Spacer(modifier = Modifier.height(30.dp))
 
                     TrackTitle(
-                        title = currentSong?.title ?: "No Track",
+                        title = uiState.currentSong?.title ?: "No Track",
                         color = contentColor
                     )
 
                     ArtistName(
-                        artist = currentSong?.artist ?: "Unknown Artist",
+                        artist = uiState.currentSong?.artist ?: "Unknown Artist",
                         color = contentColor.copy(alpha = 0.8f)
                     )
 
@@ -189,9 +181,9 @@ fun AmberoidUI(
 
                     WaveformSeekBar(
                         progressFraction = progressFraction,
-                        songId = currentSong?.id ?: 0L,
+                        songId = uiState.currentSong?.id ?: 0L,
                         onSeek = { fraction ->
-                            val targetMs = (fraction * duration).toLong()
+                            val targetMs = (fraction * uiState.duration).toLong()
                             viewModel.onEvent(UiEvent.SeekTo(targetMs))
                         },
                         modifier = Modifier.padding(horizontal = 30.dp),
@@ -205,10 +197,10 @@ fun AmberoidUI(
                         modifier = Modifier.size(300.dp, 17.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        PlayedTrackTime(positionMs = currentPosition, color = contentColor)
+                        PlayedTrackTime(positionMs = uiState.currentPosition, color = contentColor)
                         TrackLength(
-                            positionMs = currentPosition,
-                            durationMs = duration,
+                            positionMs = uiState.currentPosition,
+                            durationMs = uiState.duration,
                             color = contentColor
                         )
                     }
@@ -229,7 +221,7 @@ fun AmberoidUI(
                         VolumeBar(
                             color = secondaryButtonColor,
                             onVolumeChange = { newVolume -> viewModel.onEvent(UiEvent.SetVolume(newVolume)) },
-                            volume = volume
+                            volume = uiState.volume
                         )
 
                         VolumeUp(
@@ -251,7 +243,7 @@ fun AmberoidUI(
                         )
 
                         PlayPause(
-                            isPlaying = isPlaying,
+                            isPlaying = uiState.isPlaying,
                             onPlayToggle = { viewModel.onEvent(UiEvent.TogglePlayPause) },
                             color = primaryButtonColor,
                             iconColor = primaryIconColor
@@ -278,7 +270,7 @@ fun AmberoidUI(
                         ShufflePlaylistButton(
                             color = secondaryButtonColor,
                             onShuffle = { viewModel.onEvent(UiEvent.ToggleShuffle) },
-                            isShuffleEnabled = isShuffleEnabled,
+                            isShuffleEnabled = uiState.isShuffleEnabled,
                             iconColor = secondaryIconColor
                         )
 
@@ -287,7 +279,7 @@ fun AmberoidUI(
                         RepeatPlaylistButton(
                             color = secondaryButtonColor,
                             onRepeat = { viewModel.onEvent(UiEvent.ToggleRepeatMode) },
-                            repeatMode = repeatMode,
+                            repeatMode = uiState.repeatMode,
                             iconColor = secondaryIconColor
                         )
 
@@ -322,11 +314,11 @@ fun AmberoidUI(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             TrackTitle(
-                                title = currentSong?.title ?: "No Track",
+                                title = uiState.currentSong?.title ?: "No Track",
                                 color = contentColor
                             )
                             ArtistName(
-                                artist = currentSong?.artist ?: "Unknown Artist",
+                                artist = uiState.currentSong?.artist ?: "Unknown Artist",
                                 color = contentColor.copy(alpha = 0.7f)
                             )
                         }
@@ -338,9 +330,9 @@ fun AmberoidUI(
                         ) {
                             WaveformSeekBar(
                                 progressFraction = progressFraction,
-                                songId = currentSong?.id ?: 0L,
+                                songId = uiState.currentSong?.id ?: 0L,
                                 onSeek = { fraction ->
-                                    val targetMs = (fraction * duration).toLong()
+                                    val targetMs = (fraction * uiState.duration).toLong()
                                     viewModel.onEvent(UiEvent.SeekTo(targetMs))
                                 },
                                 modifier = Modifier.fillMaxWidth(),
@@ -352,10 +344,10 @@ fun AmberoidUI(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                PlayedTrackTime(positionMs = currentPosition, color = contentColor)
+                                PlayedTrackTime(positionMs = uiState.currentPosition, color = contentColor)
                                 TrackLength(
-                                    positionMs = currentPosition,
-                                    durationMs = duration,
+                                    positionMs = uiState.currentPosition,
+                                    durationMs = uiState.duration,
                                     color = contentColor
                                 )
                             }
@@ -373,7 +365,7 @@ fun AmberoidUI(
                             )
 
                             PlayPause(
-                                isPlaying = isPlaying,
+                                isPlaying = uiState.isPlaying,
                                 onPlayToggle = { viewModel.onEvent(UiEvent.TogglePlayPause) },
                                 color = primaryButtonColor,
                                 iconColor = primaryIconColor
@@ -400,7 +392,7 @@ fun AmberoidUI(
                             VolumeBar(
                                 color = secondaryButtonColor,
                                 onVolumeChange = { newVolume -> viewModel.onEvent(UiEvent.SetVolume(newVolume)) },
-                                volume = volume
+                                volume = uiState.volume
                             )
 
                             VolumeUp(
@@ -424,14 +416,14 @@ fun AmberoidUI(
                             ShufflePlaylistButton(
                                 color = secondaryButtonColor,
                                 onShuffle = { viewModel.onEvent(UiEvent.ToggleShuffle) },
-                                isShuffleEnabled = isShuffleEnabled,
+                                isShuffleEnabled = uiState.isShuffleEnabled,
                                 iconColor = secondaryIconColor
                             )
 
                             RepeatPlaylistButton(
                                 color = secondaryButtonColor,
                                 onRepeat = { viewModel.onEvent(UiEvent.ToggleRepeatMode) },
-                                repeatMode = repeatMode,
+                                repeatMode = uiState.repeatMode,
                                 iconColor = secondaryIconColor
                             )
 
