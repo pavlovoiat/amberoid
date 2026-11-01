@@ -48,18 +48,10 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val repository = AudioRepository(appContext)
     private val prefs = PlaybackPreferences(appContext)
     private val artworkPalette = ArtworkPalette()
-    private val volumeManager = VolumeManager(
-        appContext,
-        onUpdateState = { volume ->
-            _uiState.update { it.copy(volume = volume) }
-        }
-    )
-
     private var mediaController: MediaController? = null
     private var progressUpdateJob: Job? = null
 
     private var originalSongs = emptyList<Song>()
-
     private var isStateRestored = false
 
     private val _mediaController = MutableStateFlow<MediaController?>(null)
@@ -69,6 +61,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    private val volumeManager = VolumeManager(
+        appContext,
+        onUpdateState = { volume ->
+            _uiState.update { it.copy(volume = volume) }
+        }
+    )
 
     init {
         setupMediaController()

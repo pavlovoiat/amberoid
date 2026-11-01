@@ -30,6 +30,7 @@ class VolumeManager(
         } else {
             context.registerReceiver(volumeReceiver, filter)
         }
+        onUpdateState(getCurrentVolumeRatio())
     }
 
     private fun getCurrentVolumeRatio(): Float {
