@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class VolumeManager(
     private val context: Context,
-    private val onUpdateState: ((UiState) -> UiState) -> Unit
+    private val onUpdateState: (Float) -> Unit
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
@@ -21,9 +21,8 @@ class VolumeManager(
     private val volumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
-                onUpdateState { currentState ->
-                    currentState.copy(volume = getCurrentVolumeRatio())
-                }
+                val currentVolume = getCurrentVolumeRatio()
+                onUpdateState(currentVolume)
             }
         }
     }
@@ -44,9 +43,7 @@ class VolumeManager(
 
     fun setVolume(newVolumeRatio: Float) {
         val clampedRatio = newVolumeRatio.coerceIn(0f, 1f)
-        onUpdateState { currentState ->
-            currentState.copy(volume = clampedRatio)
-        }
+        onUpdateState(clampedRatio)
         val targetVolume = (clampedRatio * maxVolume).toInt()
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
     }

@@ -111,8 +111,8 @@ fun AmberoidUI(
                 songs = uiState.songs,
                 currentSong = uiState.currentSong,
                 onSongClick = { song ->
-                    viewModel.selectSong(song)
-                    viewModel.play()
+                    viewModel.onEvent(UiEvent.SelectSong(song))
+                    viewModel.onEvent(UiEvent.Play)
                     scope.launch { drawerState.close() }
                 },
                 currentSort = currentSort,
