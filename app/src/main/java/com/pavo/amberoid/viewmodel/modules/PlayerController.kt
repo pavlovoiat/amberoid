@@ -7,30 +7,29 @@ import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
 
 class PlayerController(
-    private val controller: MediaController?,
-    private val isPlaying: Boolean,
-    private val currentSong: Song?,
-    private val currentPosition: Long,
-    private val songs: List<Song>,
-    private val isShuffleEnabled: Boolean,
-    private val originalSongs: List<Song>,
-    private val currentSortOrder: SortOrder,
+    private val getController: () -> MediaController?,
+    private val getIsPlaying: () -> Boolean,
+    private val getCurrentSong: () -> Song?,
+    private val getCurrentPosition: () -> Long,
+    private val getSongs: () -> List<Song>,
+    private val getIsShuffleEnabled: () -> Boolean,
+    private val getOriginalSongs: () -> List<Song>,
+    private val getCurrentSortOrder: () -> SortOrder,
     private val onCurrentSongChanged: (Song) -> Unit,
     private val onCurrentPositionChanged: (Long) -> Unit,
     private val onShuffleChanged: (Boolean) -> Unit,
     private val onRepeatModeChanged: (Int) -> Unit,
     private val onPlaylistsChanged: (List<Song>) -> Unit,
     private val applySort: (List<Song>, SortOrder) -> List<Song>
-
-    ) {
+) {
     fun selectSong(song: Song) {
-        val allSongs = songs
+        val allSongs = getSongs()
         val index = allSongs.indexOf(song)
         if (index == -1) return
 
         onCurrentSongChanged(song)
 
-        controller?.let { controller ->
+        getController()?.let { controller ->
             if (controller.mediaItemCount != allSongs.size) {
                 val mediaItems = allSongs.map {
                     MediaItem.Builder().setMediaId(it.id.toString()).setUri(it.contentUri).build()
@@ -47,12 +46,12 @@ class PlayerController(
     }
 
     fun play() {
-        controller?.play()
+        getController()?.play()
     }
 
     fun togglePlayPause() {
-        val controller = controller ?: return
-        val currentSong = currentSong ?: return
+        val controller = getController() ?: return
+        val currentSong = getCurrentSong() ?: return
         if (controller.isPlaying) {
             controller.pause()
         } else {
@@ -64,7 +63,7 @@ class PlayerController(
     }
 
     fun playPrevious() {
-        controller?.let {
+        getController()?.let {
             if (it.currentPosition > 3000) {
                 it.seekTo(0L)
             } else if (it.hasPreviousMediaItem()) {
@@ -76,7 +75,7 @@ class PlayerController(
     }
 
     fun playNext() {
-        controller?.let {
+        getController()?.let {
             if (it.hasNextMediaItem()) {
                 it.seekToNextMediaItem()
             }
@@ -84,24 +83,28 @@ class PlayerController(
     }
 
     fun toggleShuffle() {
-        controller?.let { controller ->
+        getController()?.let { controller ->
+            val isShuffleEnabled = getIsShuffleEnabled()
             val newState = !isShuffleEnabled
             onShuffleChanged(newState)
 
-            val current = currentSong
-            val currentPos = currentPosition
+            val current = getCurrentSong()
+            val currentPos = getCurrentPosition()
+            val originalSongs = getOriginalSongs()
+            val currentSortOrder = getCurrentSortOrder()
 
-            if (newState) {
+            val newSongs = if (newState) {
                 val shuffledList = originalSongs.filter { it.id != current?.id }.shuffled()
-                onPlaylistsChanged(if (current != null) listOf(current) + shuffledList else shuffledList)
+                if (current != null) listOf(current) + shuffledList else shuffledList
             } else {
-                onPlaylistsChanged(applySort(originalSongs, currentSortOrder))
+                applySort(originalSongs, currentSortOrder)
             }
+            onPlaylistsChanged(newSongs)
 
-            val mediaItems = songs.map {
+            val mediaItems = newSongs.map {
                 MediaItem.Builder().setMediaId(it.id.toString()).setUri(it.contentUri).build()
             }
-            val newIndex = songs.indexOfFirst { it.id == current?.id }
+            val newIndex = newSongs.indexOfFirst { it.id == current?.id }
 
             if (newIndex != -1) {
                 controller.setMediaItems(mediaItems, newIndex, currentPos)
@@ -113,12 +116,12 @@ class PlayerController(
             if (controller.playbackState == Player.STATE_IDLE || controller.playbackState == Player.STATE_ENDED) {
                 controller.prepare()
             }
-            if (isPlaying) controller.play()
+            if (getIsPlaying()) controller.play()
         }
     }
 
     fun toggleRepeatMode() {
-        controller?.let { controller ->
+        getController()?.let { controller ->
             val nextMode = when (controller.repeatMode) {
                 Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
                 Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
@@ -130,7 +133,7 @@ class PlayerController(
     }
 
     fun seekTo(positionMs: Long) {
-        controller?.seekTo(positionMs)
+        getController()?.seekTo(positionMs)
         onCurrentPositionChanged(positionMs)
     }
 }

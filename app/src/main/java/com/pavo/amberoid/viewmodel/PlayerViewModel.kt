@@ -70,15 +70,35 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    init {
+        setupMediaController()
+        observeInitialization()
+    }
+
+    fun onEvent(event: UiEvent) {
+        when (event) {
+            is UiEvent.Play -> playerController.play()
+            is UiEvent.PlayPrevious -> playerController.playPrevious()
+            is UiEvent.PlayNext -> playerController.playNext()
+            is UiEvent.TogglePlayPause -> playerController.togglePlayPause()
+            is UiEvent.ToggleShuffle -> playerController.toggleShuffle()
+            is UiEvent.ToggleRepeatMode -> playerController.toggleRepeatMode()
+            is UiEvent.SeekTo -> playerController.seekTo(event.positionMs)
+            is UiEvent.SetVolume -> volumeManager.setVolume(event.volume)
+            is UiEvent.UpdateSortOrder -> updateSortOrder(event.sortOrder)
+            is UiEvent.SelectSong -> playerController.selectSong(event.song)
+        }
+    }
+
     private val playerController = PlayerController(
-        controller = mediaController,
-        isPlaying = _uiState.value.isPlaying,
-        currentSong = _uiState.value.currentSong,
-        currentPosition = _uiState.value.currentPosition,
-        songs = _uiState.value.songs,
-        originalSongs = originalSongs,
-        isShuffleEnabled = _uiState.value.isShuffleEnabled,
-        currentSortOrder = currentSortOrder,
+        getController = { mediaController },
+        getIsPlaying = { _uiState.value.isPlaying },
+        getCurrentSong = { _uiState.value.currentSong },
+        getCurrentPosition = { _uiState.value.currentPosition },
+        getSongs = { _uiState.value.songs },
+        getIsShuffleEnabled = { _uiState.value.isShuffleEnabled },
+        getOriginalSongs = { originalSongs },
+        getCurrentSortOrder = { currentSortOrder },
         onCurrentSongChanged = { currentSong ->
             _uiState.update { it.copy(currentSong = currentSong) }
         },
@@ -96,21 +116,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         },
         applySort = ::applySort
     )
-
-    fun onEvent(event: UiEvent) {
-        when (event) {
-            is UiEvent.Play -> playerController.play()
-            is UiEvent.PlayPrevious -> playerController.playPrevious()
-            is UiEvent.PlayNext -> playerController.playNext()
-            is UiEvent.TogglePlayPause -> playerController.togglePlayPause()
-            is UiEvent.ToggleShuffle -> playerController.toggleShuffle()
-            is UiEvent.ToggleRepeatMode -> playerController.toggleRepeatMode()
-            is UiEvent.SeekTo -> playerController.seekTo(event.positionMs)
-            is UiEvent.SetVolume -> volumeManager.setVolume(event.volume)
-            is UiEvent.UpdateSortOrder -> updateSortOrder(event.sortOrder)
-            is UiEvent.SelectSong -> playerController.selectSong(event.song)
-        }
-    }
 
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -136,11 +141,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 _uiState.update { it.copy(currentSong = songList[newIndex]) }
             }
         }
-    }
-
-    init {
-        setupMediaController()
-        observeInitialization()
     }
 
     private fun setupMediaController() {
