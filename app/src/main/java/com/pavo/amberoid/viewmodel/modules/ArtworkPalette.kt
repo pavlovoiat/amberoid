@@ -24,7 +24,7 @@ class ArtworkPalette {
             val bytes = retriever.embeddedPicture
             artworkCache[uri] = bytes
             bytes
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             artworkCache[uri] = null
             null
         } finally {
@@ -127,7 +127,7 @@ class ArtworkPalette {
                     isDark = isDark,
                     allSwatches = extractedSwatches
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 extractFullPalette(null)
             }
         }
