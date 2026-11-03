@@ -26,7 +26,7 @@ class PlaybackPreferences(context: Context) {
         val name = preferences.getString("sort_order", SortOrder.DATE_DESC.name)
         return try {
             SortOrder.valueOf(name ?: SortOrder.DATE_DESC.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             SortOrder.DATE_DESC
         }
     }
