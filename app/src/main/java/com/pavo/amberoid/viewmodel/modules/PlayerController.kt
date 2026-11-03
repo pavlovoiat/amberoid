@@ -5,14 +5,11 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
+import com.pavo.amberoid.data.model.UiState
 
 class PlayerController(
     private val getController: () -> MediaController?,
-    private val getIsPlaying: () -> Boolean,
-    private val getCurrentSong: () -> Song?,
-    private val getCurrentPosition: () -> Long,
-    private val getSongs: () -> List<Song>,
-    private val getIsShuffleEnabled: () -> Boolean,
+    private val getUiState: () -> UiState,
     private val getOriginalSongs: () -> List<Song>,
     private val getCurrentSortOrder: () -> SortOrder,
     private val onCurrentSongChanged: (Song) -> Unit,
@@ -23,7 +20,7 @@ class PlayerController(
     private val applySort: (List<Song>, SortOrder) -> List<Song>
 ) {
     fun selectSong(song: Song) {
-        val allSongs = getSongs()
+        val allSongs = getUiState().songs
         val index = allSongs.indexOf(song)
         if (index == -1) return
 
@@ -51,7 +48,7 @@ class PlayerController(
 
     fun togglePlayPause() {
         val controller = getController() ?: return
-        val currentSong = getCurrentSong() ?: return
+        val currentSong = getUiState().currentSong ?: return
         if (controller.isPlaying) {
             controller.pause()
         } else {
@@ -84,12 +81,12 @@ class PlayerController(
 
     fun toggleShuffle() {
         getController()?.let { controller ->
-            val isShuffleEnabled = getIsShuffleEnabled()
+            val isShuffleEnabled = getUiState().isShuffleEnabled
             val newState = !isShuffleEnabled
             onShuffleChanged(newState)
 
-            val current = getCurrentSong()
-            val currentPos = getCurrentPosition()
+            val current = getUiState().currentSong
+            val currentPos = getUiState().currentPosition
             val originalSongs = getOriginalSongs()
             val currentSortOrder = getCurrentSortOrder()
 
@@ -116,7 +113,7 @@ class PlayerController(
             if (controller.playbackState == Player.STATE_IDLE || controller.playbackState == Player.STATE_ENDED) {
                 controller.prepare()
             }
-            if (getIsPlaying()) controller.play()
+            if (getUiState().isPlaying) controller.play()
         }
     }
 

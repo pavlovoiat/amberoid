@@ -91,11 +91,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private val playerController = PlayerController(
         getController = { mediaController },
-        getIsPlaying = { _uiState.value.isPlaying },
-        getCurrentSong = { _uiState.value.currentSong },
-        getCurrentPosition = { _uiState.value.currentPosition },
-        getSongs = { _uiState.value.songs },
-        getIsShuffleEnabled = { _uiState.value.isShuffleEnabled },
+        getUiState = { _uiState.value },
         getOriginalSongs = { originalSongs },
         getCurrentSortOrder = { currentSortOrder },
         onCurrentSongChanged = { currentSong ->
@@ -171,7 +167,16 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun observeInitialization() {
         viewModelScope.launch {
-            combine(_uiState.map { it.songs }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = _uiState.value.songs), mediaControllerFlow) { songList, controller ->
+            combine(
+                _uiState
+                    .map { it.songs }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.WhileSubscribed(5000),
+                        initialValue = _uiState.value.songs
+                    ),
+                mediaControllerFlow
+            ) { songList, controller ->
                 songList to controller
             }.collectLatest { (songList, controller) ->
                 if (songList.isNotEmpty() && controller != null) {
@@ -180,7 +185,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                             syncControllerWithSongs(controller, songList)
                             restorePlaybackState(controller, songList)
                         } else {
-                            // If controller already has items (service was running), sync our local UI list once
                             val currentItems = mutableListOf<Song>()
                             for (i in 0 until controller.mediaItemCount) {
                                 val mediaId = controller.getMediaItemAt(i).mediaId
@@ -275,7 +279,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val artworkBytes: StateFlow<ByteArray?> = _uiState.map { it.currentSong }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = _uiState.value.currentSong)
+    val artworkBytes: StateFlow<ByteArray?> = _uiState
+        .map { it.currentSong }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = _uiState.value.currentSong
+        )
         .mapLatest { song ->
             song?.let {
                 withContext(Dispatchers.IO) {
