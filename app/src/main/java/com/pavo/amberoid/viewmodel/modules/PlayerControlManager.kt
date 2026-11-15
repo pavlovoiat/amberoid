@@ -7,7 +7,7 @@ import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
 import com.pavo.amberoid.data.model.UiState
 
-class PlayerController(
+class PlayerControlManager(
     private val getController: () -> MediaController?,
     private val getUiState: () -> UiState,
     private val getOriginalSongs: () -> List<Song>,
