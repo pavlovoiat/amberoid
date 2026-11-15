@@ -7,18 +7,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import com.pavo.amberoid.data.local.PlaybackPreferences
 import com.pavo.amberoid.data.model.CoverPalette
 import com.pavo.amberoid.data.model.Song
-import com.pavo.amberoid.data.model.SortOrder
 import com.pavo.amberoid.data.model.UiEvent
 import com.pavo.amberoid.data.model.UiState
-import com.pavo.amberoid.data.repository.AudioRepository
 import com.pavo.amberoid.viewmodel.modules.ArtworkThemeManager
 import com.pavo.amberoid.viewmodel.modules.MediaConnectionManager
 import com.pavo.amberoid.viewmodel.modules.PlayerControlManager
+import com.pavo.amberoid.viewmodel.modules.SongSortManager
 import com.pavo.amberoid.viewmodel.modules.VolumeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,14 +40,11 @@ import kotlin.time.Duration.Companion.milliseconds
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
     private val appContext = application
 
-    private val repository = AudioRepository(appContext)
     private val prefs = PlaybackPreferences(appContext)
     private val artworkPalette = ArtworkThemeManager()
 
     private var originalSongs = emptyList<Song>()
     private var isStateRestored = false
-
-    private var currentSortOrder: SortOrder = prefs.getSortOrder()
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -82,6 +77,16 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     )
 
+    private val songSortManager = SongSortManager(
+        appContext,
+        getController = { mediaConnectionManager.getController() },
+        getOriginalSongs = { originalSongs },
+        getUiState = { _uiState.value },
+        onSongsChanged = { songs ->
+            _uiState.update { it.copy(songs = songs) }
+        }
+    )
+
 
     init {
         observeInitialization()
@@ -97,7 +102,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             is UiEvent.ToggleRepeatMode -> playerControlManager.toggleRepeatMode()
             is UiEvent.SeekTo -> playerControlManager.seekTo(event.positionMs)
             is UiEvent.SetVolume -> volumeManager.setVolume(event.volume)
-            is UiEvent.UpdateSortOrder -> updateSortOrder(event.sortOrder)
+            is UiEvent.UpdateSortOrder -> songSortManager.updateSortOrder(event.sortOrder)
             is UiEvent.SelectSong -> playerControlManager.selectSong(event.song)
         }
     }
@@ -106,7 +111,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         getController = { mediaConnectionManager.getController() },
         getUiState = { _uiState.value },
         getOriginalSongs = { originalSongs },
-        getCurrentSortOrder = { currentSortOrder },
+        getCurrentSortOrder = { songSortManager.currentSortOrder },
         onCurrentSongChanged = { currentSong ->
             _uiState.update { it.copy(currentSong = currentSong) }
         },
@@ -122,7 +127,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         onPlaylistsChanged = { songs ->
             _uiState.update { it.copy(songs = songs) }
         },
-        applySort = ::applySort
+        applySort = { songList, order -> songSortManager.applySort(songList, order) }
     )
 
     private fun observeInitialization() {
@@ -183,29 +188,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         _uiState.update { it.copy(isPlaying = controller.isPlaying) }
         _uiState.update { it.copy(duration = controller.duration.coerceAtLeast(0L)) }
         _uiState.update { it.copy(repeatMode = controller.repeatMode) }
-        _uiState.update {
-            it.copy(
-                currentPosition = controller.currentPosition.coerceAtLeast(
-                    0L
-                )
-            )
-        }
+        _uiState.update { it.copy(currentPosition = controller.currentPosition.coerceAtLeast(0L)) }
 
         val currentIndex = controller.currentMediaItemIndex
         val currentList = _uiState.value.songs
 
         if (currentList.isNotEmpty() && currentIndex in currentList.indices) {
             _uiState.update { it.copy(currentSong = currentList[currentIndex]) }
-        }
-    }
-
-    fun loadSongs() {
-        if (_uiState.value.songs.isNotEmpty()) return
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val loadedSongs = repository.getAudioFiles()
-            originalSongs = loadedSongs
-            _uiState.update { it.copy(songs = applySort(loadedSongs, currentSortOrder)) }
         }
     }
 
@@ -300,53 +289,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
             _sleepTimerText.value = "Off"
             mediaConnectionManager.getController()?.pause()
-        }
-    }
-
-    fun updateSortOrder(newOrder: SortOrder) {
-        currentSortOrder = newOrder
-        prefs.saveSortOrder(newOrder)
-
-        val currentSongObj = _uiState.value.currentSong
-        val currentPos = _uiState.value.currentPosition
-
-        val sortedList = applySort(originalSongs, newOrder)
-
-        _uiState.update { it.copy(songs = sortedList) }
-
-        mediaConnectionManager.getController()?.let { controller ->
-            val mediaItems = sortedList.map { song ->
-                MediaItem.Builder()
-                    .setMediaId(song.id.toString())
-                    .setUri(song.contentUri)
-                    .build()
-            }
-
-            val newIndex = sortedList.indexOfFirst { it.id == currentSongObj?.id }
-
-            if (newIndex != -1) {
-                controller.setMediaItems(mediaItems, newIndex, currentPos)
-            } else {
-                controller.setMediaItems(mediaItems)
-            }
-
-            if (controller.playbackState == Player.STATE_IDLE || controller.playbackState == Player.STATE_ENDED) {
-                controller.prepare()
-            }
-            if (_uiState.value.isPlaying) controller.play()
-        }
-    }
-
-    private fun applySort(list: List<Song>, order: SortOrder): List<Song> {
-        return when (order) {
-            SortOrder.TITLE_ASC -> list.sortedBy { it.title.lowercase() }
-            SortOrder.TITLE_DESC -> list.sortedByDescending { it.title.lowercase() }
-            SortOrder.ARTIST_ASC -> list.sortedBy { it.artist.lowercase() }
-            SortOrder.ARTIST_DESC -> list.sortedByDescending { it.artist.lowercase() }
-            SortOrder.DURATION_ASC -> list.sortedBy { it.duration }
-            SortOrder.DURATION_DESC -> list.sortedByDescending { it.duration }
-            SortOrder.DATE_ASC -> list.sortedBy { it.dateAdded }
-            SortOrder.DATE_DESC -> list.sortedByDescending { it.dateAdded }
         }
     }
 
