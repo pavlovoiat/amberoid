@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class PlaybackService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
     private var player: ExoPlayer? = null
-    private lateinit var prefs: PlaybackPreferences
+    private lateinit var preferences: PlaybackPreferences
     
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
     private var progressLogJob: Job? = null
@@ -38,7 +38,7 @@ class PlaybackService : MediaSessionService() {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             mediaItem?.mediaId?.toLongOrNull()?.let { songId ->
-                prefs.saveLastPosition(songId, 0L)
+                preferences.saveLastPosition(songId, 0L)
             }
         }
     }
@@ -46,7 +46,7 @@ class PlaybackService : MediaSessionService() {
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
-        prefs = PlaybackPreferences(applicationContext)
+        preferences = PlaybackPreferences(applicationContext)
         createNotificationChannel()
         
         val notificationProvider = androidx.media3.session.DefaultMediaNotificationProvider(this)
@@ -100,7 +100,7 @@ class PlaybackService : MediaSessionService() {
         val currentMediaItem = p.currentMediaItem
         currentMediaItem?.mediaId?.toLongOrNull()?.let { songId ->
             val pos = p.currentPosition.coerceAtLeast(0L)
-            prefs.saveLastPosition(songId, pos)
+            preferences.saveLastPosition(songId, pos)
         }
     }
 
