@@ -8,9 +8,6 @@ import com.pavo.amberoid.data.local.PlaybackPreferences
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
 import com.pavo.amberoid.data.model.UiState
-import com.pavo.amberoid.data.repository.AudioRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class SongSortManager(
     context: Context,
@@ -19,19 +16,9 @@ class SongSortManager(
     private val getUiState: () -> UiState,
     private val onSongsChanged: (List<Song>) -> Unit
 ) {
-    private val repository = AudioRepository(context)
     private val preferences = PlaybackPreferences(context)
     private var _currentSortOrder = preferences.getSortOrder()
     val currentSortOrder = _currentSortOrder
-
-    suspend fun loadSongs() {
-        if (getUiState().songs.isNotEmpty()) return
-
-        withContext(Dispatchers.IO) {
-            val loadedSongs = repository.getAudioFiles()
-            onSongsChanged(applySort(loadedSongs, _currentSortOrder))
-        }
-    }
 
     fun updateSortOrder(newOrder: SortOrder) {
         _currentSortOrder = newOrder

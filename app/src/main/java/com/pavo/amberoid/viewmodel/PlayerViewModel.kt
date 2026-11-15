@@ -13,6 +13,7 @@ import com.pavo.amberoid.data.model.CoverPalette
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.UiEvent
 import com.pavo.amberoid.data.model.UiState
+import com.pavo.amberoid.data.repository.AudioRepository
 import com.pavo.amberoid.viewmodel.module.ArtworkThemeManager
 import com.pavo.amberoid.viewmodel.module.MediaConnectionManager
 import com.pavo.amberoid.viewmodel.module.PlayerControlManager
@@ -40,6 +41,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appContext = application
+    private val repository = AudioRepository(appContext)
     private val preferences = PlaybackPreferences(appContext)
 
     private var originalSongs = emptyList<Song>()
@@ -78,7 +80,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     )
 
-    private val songSortManager = SongSortManager(
+    val songSortManager = SongSortManager(
         appContext,
         getController = { mediaConnectionManager.getController() },
         getOriginalSongs = { originalSongs },
@@ -290,6 +292,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
             _sleepTimerText.value = "Off"
             mediaConnectionManager.getController()?.pause()
+        }
+    }
+
+    fun loadSongs() {
+        if (_uiState.value.songs.isNotEmpty()) return
+
+        viewModelScope.launch {
+            val loadedSongs = repository.getAudioFiles()
+            _uiState.update { it.copy(songs = songSortManager.applySort(loadedSongs, songSortManager.currentSortOrder)) }
         }
     }
 
