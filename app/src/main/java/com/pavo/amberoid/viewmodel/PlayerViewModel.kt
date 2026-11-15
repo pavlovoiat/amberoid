@@ -13,11 +13,11 @@ import com.pavo.amberoid.data.model.CoverPalette
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.UiEvent
 import com.pavo.amberoid.data.model.UiState
-import com.pavo.amberoid.viewmodel.modules.ArtworkThemeManager
-import com.pavo.amberoid.viewmodel.modules.MediaConnectionManager
-import com.pavo.amberoid.viewmodel.modules.PlayerControlManager
-import com.pavo.amberoid.viewmodel.modules.SongSortManager
-import com.pavo.amberoid.viewmodel.modules.VolumeManager
+import com.pavo.amberoid.viewmodel.module.ArtworkThemeManager
+import com.pavo.amberoid.viewmodel.module.MediaConnectionManager
+import com.pavo.amberoid.viewmodel.module.PlayerControlManager
+import com.pavo.amberoid.viewmodel.module.SongSortManager
+import com.pavo.amberoid.viewmodel.module.VolumeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job

@@ -1,4 +1,4 @@
-package com.pavo.amberoid.viewmodel.modules
+package com.pavo.amberoid.viewmodel.module
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player

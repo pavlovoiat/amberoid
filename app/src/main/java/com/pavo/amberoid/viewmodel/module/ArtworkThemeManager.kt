@@ -1,4 +1,4 @@
-package com.pavo.amberoid.viewmodel.modules
+package com.pavo.amberoid.viewmodel.module
 
 import android.content.Context
 import android.graphics.BitmapFactory
