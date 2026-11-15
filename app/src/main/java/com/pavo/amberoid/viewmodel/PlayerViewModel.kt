@@ -38,10 +38,9 @@ import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
-    private val appContext = application
 
-    private val prefs = PlaybackPreferences(appContext)
-    private val artworkPalette = ArtworkThemeManager()
+    private val appContext = application
+    private val preferences = PlaybackPreferences(appContext)
 
     private var originalSongs = emptyList<Song>()
     private var isStateRestored = false
@@ -49,12 +48,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val volumeManager = VolumeManager(
-        appContext,
-        onUpdateState = { volume ->
-            _uiState.update { it.copy(volume = volume) }
-        }
-    )
 
     private val mediaConnectionManager = MediaConnectionManager(
         appContext,
@@ -74,6 +67,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         onProgressUpdate = { position, duration ->
             _uiState.update { it.copy(currentPosition = position) }
             _uiState.update { it.copy(duration = duration) }
+        }
+    )
+
+    private val artworkPalette = ArtworkThemeManager()
+    private val volumeManager = VolumeManager(
+        appContext,
+        onUpdateState = { volume ->
+            _uiState.update { it.copy(volume = volume) }
         }
     )
 
@@ -169,8 +170,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun restorePlaybackState(controller: MediaController, songs: List<Song>) {
-        val lastSongId = prefs.getLastSongId()
-        val lastPosition = prefs.getLastPosition()
+        val lastSongId = preferences.getLastSongId()
+        val lastPosition = preferences.getLastPosition()
 
         if (lastSongId != -1L) {
             val index = songs.indexOfFirst { it.id == lastSongId }
@@ -292,5 +293,5 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun getSavedSortOrder() = prefs.getSortOrder()
+    fun getSavedSortOrder() = preferences.getSortOrder()
 }
