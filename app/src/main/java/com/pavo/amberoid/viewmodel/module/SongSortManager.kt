@@ -41,7 +41,7 @@ class SongSortManager(
 
             val newIndex = sortedList.indexOfFirst { it.id == currentSong?.id }
 
-            if (newIndex == -1) {
+            if (newIndex != -1) {
                 controller.setMediaItems(mediaItems, newIndex, currentPos)
             } else {
                 controller.setMediaItems(mediaItems)
