@@ -20,8 +20,8 @@ class SongSortManager(
     private val onSongsChanged: (List<Song>) -> Unit
 ) {
     private val repository = AudioRepository(context)
-    private val prefs = PlaybackPreferences(context)
-    private var _currentSortOrder = prefs.getSortOrder()
+    private val preferences = PlaybackPreferences(context)
+    private var _currentSortOrder = preferences.getSortOrder()
     val currentSortOrder = _currentSortOrder
 
     suspend fun loadSongs() {
@@ -35,7 +35,7 @@ class SongSortManager(
 
     fun updateSortOrder(newOrder: SortOrder) {
         _currentSortOrder = newOrder
-        prefs.saveSortOrder(newOrder)
+        preferences.saveSortOrder(newOrder)
 
         val currentSong = getUiState().currentSong
         val currentPos = getUiState().currentPosition
