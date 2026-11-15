@@ -108,7 +108,7 @@ fun PlaylistDrawer(
                                 text = { Text(order.label) },
                                 onClick = {
                                     onSortSelected(order)
-                                    viewModel.updateSortOrder(order)
+                                    viewModel.songSortManager.updateSortOrder(order)
                                     expanded = false
                                 }
                             )
