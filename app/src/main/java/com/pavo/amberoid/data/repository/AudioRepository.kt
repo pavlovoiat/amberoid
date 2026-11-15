@@ -41,7 +41,8 @@ class AudioRepository(private val context: Context) {
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn) ?: "Unknown Track"
-                val artist = cursor.getString(artistColumn) ?: "Unknown Artist"
+                val rawArtist = cursor.getString(artistColumn)
+                val artist = if (rawArtist.isNullOrEmpty() || rawArtist == "<unknown>") "Unknown Artist" else rawArtist
                 val duration = cursor.getLong(durationColumn)
                 val dateAdded = cursor.getLong(dateAddedColumn)
                 val contentUri = ContentUris.withAppendedId(
