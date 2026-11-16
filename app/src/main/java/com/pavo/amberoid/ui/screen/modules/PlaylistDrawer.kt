@@ -44,6 +44,8 @@ import coil3.compose.AsyncImage
 import com.pavo.amberoid.NerdFont
 import com.pavo.amberoid.data.model.Song
 import com.pavo.amberoid.data.model.SortOrder
+import com.pavo.amberoid.data.model.UiEvent
+import com.pavo.amberoid.data.model.UiState
 import com.pavo.amberoid.viewmodel.PlayerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -57,7 +59,7 @@ fun PlaylistDrawer(
     secondaryColor: Color,
     textColor: Color,
     viewModel: PlayerViewModel = viewModel(),
-    currentSort: SortOrder,
+    uiState: UiState,
     onSortSelected: (SortOrder) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -108,7 +110,8 @@ fun PlaylistDrawer(
                                 text = { Text(order.label) },
                                 onClick = {
                                     onSortSelected(order)
-                                    viewModel.songSortManager.updateSortOrder(order)
+                                    if (uiState.isShuffleEnabled) viewModel.onEvent(UiEvent.ToggleShuffle)
+                                    viewModel.onEvent(UiEvent.UpdateSortOrder(order))
                                     expanded = false
                                 }
                             )

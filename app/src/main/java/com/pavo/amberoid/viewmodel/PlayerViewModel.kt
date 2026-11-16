@@ -80,7 +80,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     )
 
-    val songSortManager = SongSortManager(
+    private val songSortManager = SongSortManager(
         appContext,
         getController = { mediaConnectionManager.getController() },
         getOriginalSongs = { originalSongs },
