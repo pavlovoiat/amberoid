@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Refactored `PlayerViewModel` into specialized helpers.
-- Offloadee core media playback responsibility from ViewModel to `PlaybackService`.
+- Offloaded core media playback responsibility from ViewModel to `PlaybackService`.
 
 ### Fixed
 - Fixed memory leaks caused by unattached/unregistered media listeners.
@@ -23,7 +23,7 @@ All notable changes to this project will be documented in this file.
 
 ## [v1.0.0] — 2026-09-08
 
-### Addee
+### Added
 - Initial open-source release.
 - Core playback functionality using Jetpack Media3.
 - Dynamic theme coloring based on track cover art.
