@@ -300,7 +300,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             val loadedSongs = repository.getAudioFiles()
-            _uiState.update { it.copy(songs = songSortManager.applySort(loadedSongs, songSortManager.currentSortOrder)) }
+            originalSongs = loadedSongs
+            _uiState.update { it.copy(songs = songSortManager.applySort(originalSongs, songSortManager.currentSortOrder)) }
         }
     }
 
